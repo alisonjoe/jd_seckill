@@ -184,17 +184,19 @@ class QrLogin:
         resp = self.session.get(url=url, headers=headers, params=payload)
 
         if not response_status(resp):
+            title = "用户[{}] 二维码获取失败".format(self.nick_name)
             msg = "用户 {} 二维码获取失败，请人工进行排查!!!".format(self.nick_name)
             logger.info(msg)
-            send_wechat(msg)
+            send_wechat(title, msg)
             return False
 
         save_image(resp, self.qrcode_img_file)
         qiniuTool = QiniuTool()
         qrUrl = qiniuTool.upload_data(self.qrcode_img_file)
-        msg = "用户 {} 二维码获取成功，请用手机浏览器打开并下载后打开京东APP扫描!!!\n{}".format(self.nick_name, qrUrl)
+        title = "用户[{}] cookies 无效，二维码获取成功".format(self.nick_name)
+        msg = "用户 {} 二维码获取成功，请用手机浏览器打开并下载后打开京东APP扫描!!!\n ![login]({})".format(self.nick_name, qrUrl)
         logger.info(msg)
-        send_wechat(msg)
+        send_wechat(title, msg)
 
         #open_image(add_bg_for_qr(self.qrcode_img_file))
         #if global_config.getRaw('messenger', 'email_enable') == 'true':
@@ -284,9 +286,10 @@ class QrLogin:
 
         self.refresh_login_status()
 
+        title = "用户[{}] 二维码登陆成功".format(self.nick_name)
         msg = "用户 {} 二维码登录成功".format(self.nick_name)
         logger.info(msg)
-        send_wechat(msg)
+        send_wechat(title, msg)
 
 
 class JDLogin(object):

@@ -392,8 +392,9 @@ class JdSeckill(object):
                 self.session.get(url='https:' + reserve_url)
                 logger.info('预约成功，已获得抢购资格 / 您已成功预约过了，无需重复预约')
                 if global_config.getRaw('messenger', 'server_chan_enable') == 'true':
+                    title = "用户[{}] 预约成功".format(self.nick_name)
                     success_message = "预约成功，已获得抢购资格 / 您已成功预约过了，无需重复预约"
-                    send_wechat(success_message)
+                    send_wechat(title, success_message)
                 break
             except Exception as e:
                 logger.error('预约失败正在重试...')
@@ -620,12 +621,14 @@ class JdSeckill(object):
             pay_url = 'https:' + resp_json.get('pcUrl')
             logger.info('抢购成功，订单号:{}, 总价:{}, 电脑端付款链接:{}'.format(order_id, total_money, pay_url))
             if global_config.getRaw('messenger', 'server_chan_enable') == 'true':
+                title = "用户[{}] 抢购成功".format(self.nick_name)
                 success_message = "抢购成功，订单号:{}, 总价:{}, 电脑端付款链接:{}".format(order_id, total_money, pay_url)
-                send_wechat(success_message)
+                send_wechat(title, success_message)
             return True
         else:
             logger.info('抢购失败，返回信息:{}'.format(resp_json))
             if global_config.getRaw('messenger', 'server_chan_enable') == 'true':
+                title = "用户[{}] 抢购失败".format(self.nick_name)
                 error_message = '抢购失败，返回信息:{}'.format(resp_json)
-                send_wechat(error_message)
+                send_wechat(title, error_message)
             return False

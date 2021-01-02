@@ -86,11 +86,11 @@ def wait_some_time():
     time.sleep(random.randint(100, 300) / 1000)
 
 
-def send_wechat(message):
+def send_wechat(title, message):
     """推送信息到微信"""
     url = 'http://sc.ftqq.com/{}.send'.format(global_config.getRaw('messenger', 'server_chan_sckey'))
     payload = {
-        "text": '抢购结果',
+        "text": title,
         "desp": message
     }
     headers = {
