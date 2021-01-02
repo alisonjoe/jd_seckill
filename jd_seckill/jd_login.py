@@ -278,7 +278,7 @@ class QrLogin:
                 break
             time.sleep(2)
         else:
-            log.error('二维码过期，请重新获取扫描')
+            logger.error('二维码过期，请重新获取扫描')
             return
 
         # validate QR code ticket
