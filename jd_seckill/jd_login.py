@@ -333,6 +333,7 @@ class JDLogin(object):
                 break
             else:
                 logger.error("二维码登录失败！")
+                time.sleep(random.randint(10, 60))
 
     def check_login(func):
         @functools.wraps(func)
