@@ -278,11 +278,13 @@ class QrLogin:
                 break
             time.sleep(2)
         else:
-            raise SKException('二维码过期，请重新获取扫描')
+            log.error('二维码过期，请重新获取扫描')
+            return
 
         # validate QR code ticket
         if not self._validate_qrcode_ticket(ticket):
-            raise SKException('二维码信息校验失败')
+            logger.error('二维码信息校验失败')
+            return
 
         self.refresh_login_status()
 
@@ -323,13 +325,14 @@ class JDLogin(object):
             # send_wechat(msg)
             return
 
-        self.qrlogin.login_by_qrcode()
-
-        if self.qrlogin.is_login:
-            self.nick_name = self.get_username()
-            self.spider_session.save_cookies_to_local(self.nick_name)
-        else:
-            raise SKException("二维码登录失败！")
+        while True:
+            self.qrlogin.login_by_qrcode()
+            if self.qrlogin.is_login:
+                self.nick_name = self.get_username()
+                self.spider_session.save_cookies_to_local(self.nick_name)
+                break
+            else:
+                logger.error("二维码登录失败！")
 
     def check_login(func):
         @functools.wraps(func)
