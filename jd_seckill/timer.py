@@ -54,3 +54,13 @@ class Timer(object):
                 break
             else:
                 time.sleep(self.sleep_interval)
+    def end(self):
+        while True:
+            # 本地时间减去与京东的时间差，能够将时间误差提升到0.1秒附近
+            # 具体精度依赖获取京东服务器时间的网络时间损耗
+            if self.local_time() - self.diff_time >= self.buy_time_ms + 600000:
+                logger.info('抢了10分钟还没抢到，自动退出……')
+                raise SKException('抢购失败，返回信息:{}'.format(resp.text[0: 128]))
+                exit()
+            else:
+                break

@@ -19,7 +19,7 @@ from .config import global_config
 from .exception import SKException
 from .util import (
     parse_json,
-    send_wechat,
+    send_wechat_igot,
     wait_some_time,
     response_status,
     save_image,
@@ -184,19 +184,19 @@ class QrLogin:
         resp = self.session.get(url=url, headers=headers, params=payload)
 
         if not response_status(resp):
-            title = "用户[{}] 二维码获取失败".format(self.nick_name)
+            title = "用户{} 二维码获取失败".format(self.nick_name)
             msg = "用户 {} 二维码获取失败，请人工进行排查!!!".format(self.nick_name)
             logger.info(msg)
-            send_wechat(title, msg)
+            send_wechat_igot(title, msg)
             return False
 
         save_image(resp, self.qrcode_img_file)
         qiniuTool = QiniuTool()
         qrUrl = qiniuTool.upload_data(self.qrcode_img_file)
-        title = "用户[{}] cookies 无效，二维码获取成功".format(self.nick_name)
-        msg = "用户 {} 二维码获取成功，请用手机浏览器打开并下载后打开京东APP扫描!!!\n ![login]({})".format(self.nick_name, qrUrl)
+        title = "用户{} cookies 无效，二维码获取成功".format(self.nick_name)
+        msg = "用户 {} 二维码获取成功，请用手机浏览器打开并下载后打开京东APP扫描!!! {}".format(self.nick_name, qrUrl)
         logger.info(msg)
-        send_wechat(title, msg)
+        send_wechat_igot(title, msg)
 
         #open_image(add_bg_for_qr(self.qrcode_img_file))
         #if global_config.getRaw('messenger', 'email_enable') == 'true':
@@ -232,7 +232,7 @@ class QrLogin:
         else:
             msg = "用户 {} 已完成手机客户端确认".format(self.nick_name)
             logger.info(msg)
-            #send_wechat(msg)
+            #send_wechat_igot(msg)
             return resp_json['ticket']
 
     def _validate_qrcode_ticket(self, ticket):
@@ -288,10 +288,10 @@ class QrLogin:
 
         self.refresh_login_status()
 
-        title = "用户[{}] 二维码登陆成功".format(self.nick_name)
+        title = "用户{} 二维码登陆成功".format(self.nick_name)
         msg = "用户 {} 二维码登录成功".format(self.nick_name)
         logger.info(msg)
-        send_wechat(title, msg)
+        send_wechat_igot(title, msg)
 
 
 class JDLogin(object):
@@ -322,7 +322,7 @@ class JDLogin(object):
             msg = "{} cookies有效，不需要重新登陆".format(self.get_username())
             logger.info(msg)
             # 有效就不发送微信消息了，免打扰
-            # send_wechat(msg)
+            # send_wechat_igot(msg)
             return
 
         while True:

@@ -85,6 +85,22 @@ def get_random_useragent():
 def wait_some_time():
     time.sleep(random.randint(100, 300) / 1000)
 
+def send_wechat_igot(title, message):
+    """推送信息到微信"""
+    #url = 'http://sc.ftqq.com/{}.send'.format(global_config.getRaw('messenger', 'server_chan_sckey'))
+    url = 'https://push.hellyw.com/{}'.format(global_config.getRaw('messenger', 'igot_sckey'))
+    headers = {
+        'User-Agent': global_config.getRaw('config', 'default_user_agent')
+    }
+
+    post_data = {
+        "title": title,
+        "content": message,
+    }
+
+    #requests.get(url, headers=headers)
+    logger.info(url)
+    requests.post(url, data = post_data)
 
 def send_wechat(title, message):
     """推送信息到微信"""
@@ -97,6 +113,7 @@ def send_wechat(title, message):
         'User-Agent': global_config.getRaw('config', 'default_user_agent')
     }
     requests.get(url, params=payload, headers=headers)
+
 
 
 def response_status(resp):
