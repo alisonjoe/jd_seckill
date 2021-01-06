@@ -173,7 +173,7 @@ class QrLogin:
         """
         url = 'https://qr.m.jd.com/show'
         payload = {
-            'appid': 133,
+            'appid': 233,
             'size': 300,
             't': str(int(time.time() * 1000)),
         }
@@ -210,7 +210,7 @@ class QrLogin:
         """
         url = 'https://qr.m.jd.com/check'
         payload = {
-            'appid': '133',
+            'appid': '233',
             'callback': 'jQuery{}'.format(random.randint(1000000, 9999999)),
             'token': self.session.cookies.get('wlfstk_smdl'),
             '_': str(int(time.time() * 1000)),

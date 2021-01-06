@@ -166,7 +166,7 @@ class QrLogin:
         """
         url = 'https://qr.m.jd.com/show'
         payload = {
-            'appid': 133,
+            'appid': 233,
             'size': 300,
             't': str(int(time.time() * 1000)),
         }
@@ -195,7 +195,7 @@ class QrLogin:
         """
         url = 'https://qr.m.jd.com/check'
         payload = {
-            'appid': '133',
+            'appid': '233',
             'callback': 'jQuery{}'.format(random.randint(1000000, 9999999)),
             'token': self.session.cookies.get('wlfstk_smdl'),
             '_': str(int(time.time() * 1000)),
@@ -388,7 +388,7 @@ class JdSeckill(object):
         resp = self.session.get(url=url, params=payload, headers=headers)
         resp_json = parse_json(resp.text)
         reserve_url = resp_json.get('url')
-        self.timers.start()
+        #self.timers.start()
         while True:
             try:
                 self.session.get(url='https:' + reserve_url)
