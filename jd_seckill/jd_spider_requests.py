@@ -361,13 +361,13 @@ class JdSeckill(object):
         抢购
         """
         while True:
+            # 超时自动退出，不然会坑推送
+            self.timers.end()
             try:
                 self.request_seckill_url()
                 while True:
                     self.request_seckill_checkout_page()
                     self.submit_seckill_order()
-                    # 超时自动退出，不然会坑推送
-                    self.timers.end()
             except Exception as e:
                 logger.info('抢购发生异常，稍后继续执行！', e)
             wait_some_time()
@@ -454,6 +454,8 @@ class JdSeckill(object):
             'Referer': 'https://item.jd.com/{}.html'.format(self.sku_id),
         }
         while True:
+            # 超时自动退出，不然会坑推送
+            self.timers.end()
             resp = self.session.get(url=url, headers=headers, params=payload)
             resp_json = parse_json(resp.text)
             if resp_json.get('url'):
