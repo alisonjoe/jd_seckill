@@ -18,6 +18,7 @@ from .config import global_config
 from .exception import SKException
 from .util import (
     parse_json,
+    send_wechat,
     send_wechat_igot,
     wait_some_time,
     response_status,
@@ -25,7 +26,6 @@ from .util import (
     open_image,
     add_bg_for_qr,
     email
-
 )
 
 
@@ -289,7 +289,11 @@ class JdSeckill(object):
 
         self.session = self.spider_session.get_session()
         self.user_agent = self.spider_session.user_agent
-        self.nick_name = None
+        if self.qrlogin.is_login:
+            self.nick_name = self.get_username()
+        else:
+            self.nick_name = None
+
 
     def login_by_qrcode(self):
         """
@@ -392,10 +396,12 @@ class JdSeckill(object):
         while True:
             try:
                 self.session.get(url='https:' + reserve_url)
-                logger.info('预约成功，已获得抢购资格 / 您已成功预约过了，无需重复预约')
+                title = "用户{} 预约消息".format(self.nick_name)
+                success_message = "预约成功，已获得抢购资格 / 您已成功预约过了，无需重复预约"
+                logger.info(success_message)
                 if global_config.getRaw('messenger', 'server_chan_enable') == 'true':
-                    title = "用户{} 预约成功".format(self.nick_name)
-                    success_message = "预约成功，已获得抢购资格-您已成功预约过了，无需重复预约"
+                    send_wechat(title, success_message)
+                if global_config.getRaw('messenger', 'igot_enable') == 'true':
                     send_wechat_igot(title, success_message)
                 break
             except Exception as e:
@@ -623,16 +629,20 @@ class JdSeckill(object):
             order_id = resp_json.get('orderId')
             total_money = resp_json.get('totalMoney')
             pay_url = 'https:' + resp_json.get('pcUrl')
-            logger.info('抢购成功，订单号:{}, 总价:{}, 电脑端付款链接:{}'.format(order_id, total_money, pay_url))
+            title = "用户{} 抢购成功".format(self.nick_name)
+            success_message = "抢购成功，订单号:{}, 总价:{}, 电脑端付款链接:{}".format(order_id, total_money, pay_url)
+            logger.info(success_message)
             if global_config.getRaw('messenger', 'server_chan_enable') == 'true':
-                title = "用户{} 抢购成功".format(self.nick_name)
-                success_message = "抢购成功，订单号:{}, 总价:{}, 电脑端付款链接:{}".format(order_id, total_money, pay_url)
+                send_wechat(title, success_message)
+            if global_config.getRaw('messenger', 'igot_enable') == 'true':
                 send_wechat_igot(title, success_message)
-            return True
+            raise SKException(success_message)
         else:
-            logger.info('抢购失败，返回信息:{}'.format(resp_json))
-            if global_config.getRaw('messenger', 'server_chan_enable') == 'true':
-                title = "用户{} 抢购失败".format(self.nick_name)
-                error_message = '抢购失败，返回信息:{}'.format(resp_json)
-                send_wechat_igot(title, error_message)
+            title = "用户{} 抢购失败".format(self.nick_name)
+            error_message = '抢购失败，返回信息:{}'.format(resp_json)
+            logger.info(error_message)
+            #if global_config.getRaw('messenger', 'server_chan_enable') == 'true':
+            #    send_wechat(title, error_message)
+            #if global_config.getRaw('messenger', 'igot_enable') == 'true':
+            #    send_wechat_igot(title, error_message)
             return False

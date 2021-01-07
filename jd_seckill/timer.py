@@ -9,6 +9,10 @@ from datetime import datetime
 
 from .jd_logger import logger
 from .config import global_config
+from .util import (
+    send_wechat,
+    send_wechat_igot
+)
 
 
 class Timer(object):
@@ -59,8 +63,13 @@ class Timer(object):
             # 本地时间减去与京东的时间差，能够将时间误差提升到0.1秒附近
             # 具体精度依赖获取京东服务器时间的网络时间损耗
             if self.local_time() - self.diff_time >= self.buy_time_ms + 600000:
-                logger.info('抢了10分钟还没抢到，自动退出……')
-                raise SKException('抢购失败，返回信息:{}'.format(resp.text[0: 128]))
-                exit()
+                title = "抢购失败"
+                error_message = "抢了10分钟还没抢到，自动退出"
+                logger.info(error_message)
+                if global_config.getRaw('messenger', 'server_chan_enable') == 'true':
+                    send_wechat(title, error_message)
+                if global_config.getRaw('messenger', 'igot_enable') == 'true':
+                    send_wechat_igot(title, error_message)
+                raise SKException('超时抢购失败')
             else:
                 break
